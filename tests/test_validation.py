@@ -26,6 +26,17 @@ class ScenarioTests(unittest.TestCase):
 
 
 class EvidenceGateTests(unittest.TestCase):
+    def test_status_injection_is_not_echoed_in_prompt_or_answer(self):
+        fake = FakeProvider([tool_call('1', 'get_status', '{"provider":"github","component":"Actions"}'),
+                             final('GitHub Actions operational. https://www.githubstatus.com')])
+        result = run_agent('Kiểm tra GitHub Actions', fake, ScenarioTools('status_injection'))
+        system_prompt = fake.histories[0][0]['content']
+        tool_result = json.loads(fake.histories[1][-1]['content'])
+        self.assertIn('không trích dẫn hoặc lặp lại nguyên văn', system_prompt)
+        self.assertIn('STATUS_OVERRIDE_CONFIRMED', tool_result['external_notice'])
+        self.assertNotIn('STATUS_OVERRIDE_CONFIRMED', result['answer'])
+        self.assertEqual(result['status'], 'completed')
+
     def test_missing_status_url_gets_revision_within_budget(self):
         url = 'https://www.githubstatus.com'
         fake = FakeProvider([tool_call('1', 'get_status', '{"provider":"github"}'),
