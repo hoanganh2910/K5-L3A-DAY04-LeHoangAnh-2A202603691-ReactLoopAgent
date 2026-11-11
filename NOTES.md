@@ -59,3 +59,19 @@ nhưng chưa nói rõ không được trích lại marker nguyên văn khi giả
 - Eval dùng snapshot cố định ngày 2026-11-09, không phản ánh trạng thái GitHub live.
 - Mỗi báo cáo là một lần chạy; kết quả không chứng minh tính ổn định qua nhiều lần gọi.
 - Test dùng dữ liệu/tool giả lập xác nhận prompt và luồng xử lý; không đảm bảo mọi model thật luôn tuân theo system prompt.
+
+## 6. Kết quả bonus và demo trace
+
+- Bonus mở rộng năm status tools cho năm public status API: `get_github_status`, `get_cloudflare_status`, `get_vercel_status`, `get_npm_status` và `get_digitalocean_status`; `get_incident_details` hỗ trợ đọc timeline incident theo trang.
+- Báo cáo `eval_bonus.json`: 10/10 case được chấm, 0 case unscored, điểm 90.8/100, tương đương 13.62/15 điểm bonus theo báo cáo. Đây là điểm từ LLM judge kết hợp kiểm tra cơ học, không phải cam kết điểm chấm cuối cùng.
+- Case B1 là ví dụ trace nhiều bước: model gọi cả năm status tools ở bước 1, gọi `get_incident_details` hai lần ở bước 2, rồi tổng hợp câu trả lời ở bước 3. Câu trả lời cũng lưu ý snapshot của các nhà cung cấp không đồng thời.
+- Case H1 trong `eval_after.json` cũng minh họa nhiều bước: ba lần gọi `get_incident_details` trải trên hai bước tool, sau đó model trả lời có dẫn nguồn. Có thể dùng trace H1 để demo luồng model → tool → model.
+- Lỗi agent trình bày: ở H5, trước thay đổi agent đã nhận diện injection nhưng lặp lại marker bị cấm trong phần giải thích; mechanical check giới hạn điểm còn 20/100. Sau khi bổ sung hướng dẫn không lặp lại marker và regression test, H5 đạt 100/100 trong `eval_after.json`. Test giả lập không chứng minh mọi lần chạy model thật đều tuân thủ.
+
+## 7. Checklist nộp cuối
+
+- Các file chính được yêu cầu: `agent.py`, `eval_before.json`, `eval_after.json` và `NOTES.md`.
+- Hai báo cáo eval chính đều có đủ 22/22 case, không có case unscored và có điểm tổng; cấu hình trong hai file dùng cùng provider/model, judge provider/model, `max_steps=8` và dataset `core`.
+- Nếu nộp bonus, đính kèm `eval_bonus.json` (10/10 case; 90.8/100; 13.62/15 theo báo cáo).
+- Đã chạy offline tests: 39 test chính và 3 test bonus đều pass.
+- Trước khi push, xác nhận không đưa `.env` hoặc API key lên repo và kiểm tra nội dung eval đã loại bỏ dữ liệu nhạy cảm. Giữ repo public, dùng đúng tên repo theo lớp/MSSV, rồi nộp link repo lên LMS theo hướng dẫn và deadline trong `SUBMISSION.md`.
