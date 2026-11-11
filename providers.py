@@ -1,4 +1,4 @@
-"""Bốn provider cùng một interface. Không chứa agent loop."""
+"""Năm provider cùng một interface. Không chứa agent loop."""
 import json
 import os
 import urllib.error
@@ -9,6 +9,7 @@ CONFIG = {
     'gemini': ('GEMINI_API_KEY', 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'),
     'openrouter': ('OPENROUTER_API_KEY', 'https://openrouter.ai/api/v1/chat/completions'),
     'anthropic': ('ANTHROPIC_API_KEY', 'https://api.anthropic.com/v1/messages'),
+    'deepseek': ('DEEPSEEK_API_KEY', 'https://api.deepseek.com/chat/completions'),
 }
 
 
@@ -47,7 +48,7 @@ class Provider:
         payload = {'model': self.model, 'messages': messages}
         if schemas:
             payload['tools'] = schemas
-        data = post_json(self.url, {'Authorization': f'Bearer {self.key}'}, payload)
+        data = post_json(self.url, {'Authorization': 'Bearer ' + self.key}, payload)
         choice = data['choices'][0]
         message = choice['message']
         calls = [{'id': c['id'], 'name': c['function']['name'], 'arguments': c['function']['arguments']} for c in message.get('tool_calls', [])]

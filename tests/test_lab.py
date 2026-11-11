@@ -119,9 +119,10 @@ class FullTrajectoryTests(unittest.TestCase):
 
     def test_all_provider_adapters_form_requests_without_keys_leaking(self):
         sample = {'choices':[{'message':{'role':'assistant','content':'ok'},'finish_reason':'stop'}], 'usage':{}}
-        for name, key in [('openai','OPENAI_API_KEY'),('gemini','GEMINI_API_KEY'),('openrouter','OPENROUTER_API_KEY')]:
+        for name, key in [('openai','OPENAI_API_KEY'),('gemini','GEMINI_API_KEY'),('openrouter','OPENROUTER_API_KEY'),('deepseek','DEEPSEEK_API_KEY')]:
             with self.subTest(name=name), patch.dict('os.environ', {key:'dummy'}), patch('providers.post_json', return_value=sample) as post:
                 result = Provider(name,'test-model').complete([{'role':'user','content':'hello'}], [])
                 self.assertEqual(result['finish'], 'stop')
                 self.assertEqual(post.call_args.args[2]['model'], 'test-model')
                 self.assertIn('chat/completions', post.call_args.args[0])
+                self.assertEqual(post.call_args.args[1]['Authorization'], 'Bearer dummy')
