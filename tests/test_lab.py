@@ -51,7 +51,8 @@ class ToolsTests(unittest.TestCase):
 
 class LoopTests(unittest.TestCase):
     def test_tool_result_is_returned_with_id(self):
-        fake = FakeProvider([tool_call('call-1', 'get_status', '{"provider":"github"}'), final()])
+        fake = FakeProvider([tool_call('call-1', 'get_status', '{"provider":"github"}'),
+                             final('Nguồn: https://www.githubstatus.com')])
         result = run_agent('kiểm tra', fake, StatusTools())
         self.assertEqual(result['status'], 'completed')
         tool_message = fake.histories[1][-1]
@@ -74,7 +75,7 @@ class LoopTests(unittest.TestCase):
         b = tool_call('b', 'get_status', '{"provider":"cloudflare"}')
         a['calls'] += b['calls']
         a['message']['tool_calls'] += b['message']['tool_calls']
-        fake = FakeProvider([a, final()])
+        fake = FakeProvider([a, final('Nguồn: https://www.githubstatus.com https://www.cloudflarestatus.com')])
         self.assertEqual(run_agent('x', fake, StatusTools())['status'], 'completed')
         self.assertEqual([m['tool_call_id'] for m in fake.histories[1][-2:]], ['a', 'b'])
 

@@ -81,9 +81,10 @@ def run_agent(question, provider, tools, max_steps=6):
                 'arguments': arguments if arguments is not None else raw_arguments,
                 'result': result,
             })
-            if (call['name'] == 'get_incident_details' and isinstance(result, dict)
-                    and result.get('ok') and isinstance(result.get('url'), str)):
-                required_sources.add(result['url'])
+            if isinstance(result, dict) and result.get('ok') is not False:
+                for source in (result.get('source'), result.get('url')):
+                    if isinstance(source, str) and source.startswith(('https://', 'http://')):
+                        required_sources.add(source)
             messages.append({
                 'role': 'tool',
                 'tool_call_id': call['id'],

@@ -35,7 +35,7 @@ class BonusAgentTests(unittest.TestCase):
         self.assertIn('DigitalOcean',p.histories[0][0]['content'])
     def test_429_observation_returns_to_model(self):
         t=BonusTools(scenario='rate_limit_once')
-        p=ScriptedProvider([call('a','get_vercel_status',{}),call('b','get_vercel_status',{}),final()])
+        p=ScriptedProvider([call('a','get_vercel_status',{}),call('b','get_vercel_status',{}),final('Nguồn: https://www.vercel-status.com')])
         result=run_agent('Kiểm tra',p,t,max_steps=5)
         self.assertEqual(result['status'],'completed')
         self.assertEqual(json.loads(p.histories[1][-1]['content'])['error'],'RATE_LIMITED')

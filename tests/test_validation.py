@@ -26,6 +26,16 @@ class ScenarioTests(unittest.TestCase):
 
 
 class EvidenceGateTests(unittest.TestCase):
+    def test_missing_status_url_gets_revision_within_budget(self):
+        url = 'https://www.githubstatus.com'
+        fake = FakeProvider([tool_call('1', 'get_status', '{"provider":"github"}'),
+                             final('GitHub đang hoạt động bình thường.'),
+                             final('GitHub đang hoạt động bình thường. Nguồn: '+url)])
+        result = run_agent('Kiểm tra GitHub', fake, StatusTools(), max_steps=4)
+        self.assertEqual(result['status'], 'completed')
+        self.assertIn(url, result['answer'])
+        self.assertTrue(any(x['event'] == 'validation_missing_source' for x in result['trace']))
+
     def test_missing_url_gets_revision_within_budget(self):
         url = 'https://stspg.io/pjgptg3cfc6n'
         fake = FakeProvider([tool_call('1', 'get_incident_details', '{"provider":"github","incident_id":"xr3myzj7ms51"}'),
